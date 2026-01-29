@@ -46,5 +46,54 @@ It allows users to upload documents (PDF, DOCX, TXT) and ask natural language qu
 
 ### Clone the Repository
 ```bash
-git clone <your-github-repo-link>
+git clone https://github.com/Musawer-Afzal/rag-qa
 cd rag-qa
+
+### Create Virtual Environment
+python -m venv venv
+source venv/bin/activate  # Linux / Mac
+venv\Scripts\activate     # Windows
+
+### Install Dependencies
+pip install -r requirements.txt
+
+### Run the Server
+uvicorn app.main:app --reload
+
+---
+
+### Upload a Document
+POST /upload
+
+## Supported formats
+
+* pdf
+* docx
+* txt
+
+## Ask a Question
+POST /qa/ask
+
+# Request Body
+{
+  "doc_name": "Psycology Complete Course.docx",
+  "question": "What is psychology?"
+}
+
+Response
+{
+  "document": "Psycology Complete Course.docx",
+  "question": "What is psychology?",
+  "answers": [
+    "Psychology is the scientific study of behavior and mental processes..."
+  ]
+}
+
+### Future Improvements
+
+* JWT authentication
+* Streaming responses
+* Hybrid retrieval (FAISS + BM25)
+* Per-document QA sessions
+* UI progress indicators
+* Persistent FAISS indexes
