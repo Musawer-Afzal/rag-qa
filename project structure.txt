@@ -1,0 +1,33 @@
+core/
+│
+├── document_processor.py     # DOCX / PDF / TXT loading
+├── chunking.py               # chunk_text, smart chunking
+├── embeddings.py             # embedding model
+├── llm_loader.py             # model loading
+├── generation.py             # UniversalQASystem
+│
+retrieval/
+├── retriever.py              # similarity search
+│
+api/
+│
+├── schemas.py                # Pydantic models (auth, upload, QA)
+├── auth.py                   # auth routes
+├── documents.py              # upload & ingestion
+├── qa.py                     # question answering
+├── rate_limit.py             # basic rate limiting
+│
+frontend/
+│
+├── index.html
+├── style.css
+├── script.js
+│
+data/
+├── uploads/                  # user uploads
+├── processed/                # cached chunks + embeddings
+│
+experiments/
+├── batch_test.py
+│
+main.py                       # FastAPI orchestration ONLY

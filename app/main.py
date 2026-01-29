@@ -184,7 +184,7 @@
 
 from fastapi import FastAPI
 from core.llm_loader import load_universal_model
-from core.embeddings import load_embeddings
+from core.embeddings import load_or_create_embeddings
 from retrieval.retriever import Retriever
 
 from api.qa import router as qa_router
@@ -200,20 +200,13 @@ def startup_event():
     # Load LLM
     tokenizer, model = load_universal_model()
 
-    # Load embeddings & chunks
-    embeddings, chunks, embedder = load_embeddings()
-
-    # Create retriever ONCE
-    app.state.retriever = Retriever(
-        embedder=embedder,
-        embeddings=embeddings,
-        chunks=chunks
-    )
+    # Initialize a dictionary to store retrievers per document
+    app.state.document_retrievers = {}
 
     app.state.tokenizer = tokenizer
     app.state.model = model
 
-    print("✅ RAG system ready")
+    print("✅ RAG system ready (no documents loaded yet)")
 
 # Routers
 app.include_router(auth_router, prefix="/auth")

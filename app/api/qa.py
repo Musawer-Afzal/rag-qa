@@ -1,35 +1,41 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
-from core.generation import generate_answer
+import re
 
 router = APIRouter()
 
-class QuestionRequest(BaseModel):
+# Input model for QA
+class QARequest(BaseModel):
+    doc_name: str
     question: str
 
-def get_retriever(request: Request):
-    return request.app.state.retriever
+# Normalize filenames (same as in upload)
+def normalize_filename(filename: str):
+    name = filename.lower()
+    name = re.sub(r"\s+", "_", name)
+    name = re.sub(r"[^\w\d_]+", "", name)
+    return name
 
-def get_llm(request: Request):
-    return request.app.state.model, request.app.state.tokenizer
+# Helper to get retriever
+def get_retriever(request: Request, doc_name: str):
+    key = normalize_filename(doc_name)
+    retrievers = getattr(request.app.state, "document_retrievers", {})
+    if key not in retrievers:
+        return None
+    return retrievers[key]
 
 @router.post("/ask")
-def ask_question(
-    payload: QuestionRequest,
-    retriever=Depends(get_retriever),
-    llm=Depends(get_llm)
-):
-    model, tokenizer = llm
+async def ask_question(request: Request, payload: QARequest):
+    retriever = get_retriever(request, payload.doc_name)
+    if retriever is None:
+        return {"error": f"Document '{payload.doc_name}' not found. Upload first."}
 
-    context = retriever.retrieve(payload.question)
-    answer = generate_answer(
-        question=payload.question,
-        context=context,
-        model=model,
-        tokenizer=tokenizer
-    )
+    # Use your RAG system to answer
+    # Example: retriever.retrieve() and model.generate()
+    results = retriever.retrieve(payload.question)
 
     return {
+        "document": payload.doc_name,
         "question": payload.question,
-        "answer": answer
+        "answers": results
     }
