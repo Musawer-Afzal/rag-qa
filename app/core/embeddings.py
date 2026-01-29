@@ -2,8 +2,7 @@ import os
 import pickle
 from docx import Document
 from PyPDF2 import PdfReader
-
-from core.llm_loader import load_embedder    # assuming you have a function to get embedding model
+from core.llm_loader import load_embedder
 
 
 

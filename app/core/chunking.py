@@ -1,4 +1,4 @@
-def chunk_text(text, chunk_size=400, overlap=50):
+def chunk_text(text, chunk_size=300, overlap=50):
     """Chunking function (kept unchanged as requested)"""
     chunks = []
     start = 0

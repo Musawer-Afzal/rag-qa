@@ -14,8 +14,7 @@ def normalize_filename(filename: str):
     name = re.sub(r"[^\w\d_]+", "", name)
     return name
 
-
-@router.post("/upload")
+@router.post("")
 async def upload_document(request: Request, file: UploadFile = File(...)):
     upload_dir = "data/uploads"
     os.makedirs(upload_dir, exist_ok=True)
@@ -24,10 +23,7 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    try:
-        embeddings, chunks, embedder = load_or_create_embeddings(file_path)
-    except ValueError as e:
-        return {"error": str(e)}
+    embeddings, chunks, embedder = load_or_create_embeddings(file_path)
 
     retriever = Retriever(
         embedder=embedder,
@@ -35,16 +31,10 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
         chunks=chunks
     )
 
-    # ✅ Initialize storage once
-    if not hasattr(request.app.state, "document_retrievers"):
-        request.app.state.document_retrievers = {}
-
     key = normalize_filename(file.filename)
-
-    # ✅ Store retriever correctly
     request.app.state.document_retrievers[key] = retriever
 
     return {
-        "message": f"Document '{file.filename}' uploaded and retriever created.",
-        "doc_key": key
+        "message": "Uploaded successfully",
+        "doc_name": file.filename
     }
