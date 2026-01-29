@@ -1,18 +1,17 @@
-import os
-import pickle
 from docx import Document
 from PyPDF2 import PdfReader
 from core.llm_loader import load_embedder
 
 
-
 def split_text(text: str, chunk_size: int = 500, overlap: int = 50):
     chunks = []
     start = 0
+
     while start < len(text):
         end = start + chunk_size
         chunks.append(text[start:end])
         start += chunk_size - overlap
+
     return chunks
 
 
@@ -22,9 +21,11 @@ def extract_text(file_path: str) -> str:
     if ext == "txt":
         with open(file_path, "r", encoding="utf-8") as f:
             return f.read()
+
     elif ext == "docx":
         doc = Document(file_path)
-        return "\n".join([p.text for p in doc.paragraphs])
+        return "\n".join(p.text for p in doc.paragraphs)
+
     elif ext == "pdf":
         reader = PdfReader(file_path)
         text = ""
@@ -33,38 +34,28 @@ def extract_text(file_path: str) -> str:
             if page_text:
                 text += page_text + "\n"
         return text
+
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
 
-def load_or_create_embeddings(file_path: str):
-    """Load embeddings if they exist, else create from file and save."""
-    base_name = os.path.basename(file_path).lower().replace(" ", "_")
-    os.makedirs("data/processed", exist_ok=True)
-
-    chunks_file = f"data/processed/{base_name}_chunks.pkl"
-    embeddings_file = f"data/processed/{base_name}_embeddings.pkl"
-
-    # If both files exist, load them
-    if os.path.exists(chunks_file) and os.path.exists(embeddings_file):
-        with open(chunks_file, "rb") as f:
-            chunks = pickle.load(f)
-        with open(embeddings_file, "rb") as f:
-            embeddings = pickle.load(f)
-        embedder = load_embedder()  # load embedding model
-        return embeddings, chunks, embedder
-
-    # Else, extract text and create chunks & embeddings
-    text = extract_text(file_path)
+def embed_chunks(text: str):
+    """
+    Extracts chunks from text and embeds them using SentenceTransformer.
+    Returns:
+        embeddings: np.ndarray (float32)
+        chunks: list[str]
+        embedder: SentenceTransformer
+    """
     chunks = split_text(text)
 
     embedder = load_embedder()
-    embeddings = embedder.encode(chunks, convert_to_tensor=True)
 
-    # Save for future use
-    with open(chunks_file, "wb") as f:
-        pickle.dump(chunks, f)
-    with open(embeddings_file, "wb") as f:
-        pickle.dump(embeddings, f)
+    # FAISS requires float32 NumPy arrays
+    embeddings = embedder.encode(
+        chunks,
+        convert_to_numpy=True,
+        normalize_embeddings=True
+    )
 
     return embeddings, chunks, embedder
