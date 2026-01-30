@@ -2,7 +2,6 @@ from fastapi import APIRouter, UploadFile, File, Request
 import shutil
 import os
 import re
-
 from core.embeddings import embed_chunks, extract_text
 from retrieval.retriever import Retriever
 
@@ -26,7 +25,7 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    # 🔥 FIX: extract text first
+    # extract text first
     text = extract_text(file_path)
 
     embeddings, chunks, embedder = embed_chunks(text)

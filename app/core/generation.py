@@ -16,7 +16,7 @@ class UniversalQASystem:
         self.model = model
         self.model.eval()
 
-        print(f"✓ QA system ready on {next(self.model.parameters()).device}")
+        print(f"QA system ready on {next(self.model.parameters()).device}")
 
     def answer(self, context: str, question: str, verbose: bool = False) -> str:
         """Generate answer from retrieved context"""

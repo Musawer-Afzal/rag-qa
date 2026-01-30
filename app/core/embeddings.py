@@ -3,7 +3,7 @@ from PyPDF2 import PdfReader
 from core.llm_loader import load_embedder
 
 
-def split_text(text: str, chunk_size: int = 500, overlap: int = 50):
+def split_text(text: str, chunk_size: int = 350, overlap: int = 50):
     chunks = []
     start = 0
 

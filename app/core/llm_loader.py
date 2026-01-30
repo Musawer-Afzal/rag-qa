@@ -28,8 +28,6 @@ def load_universal_model(model_name: str = "google/flan-t5-base"):
     print("✓ Model loaded and ready")
     return tokenizer, model
 
-# core/llm_loader.py
-
 def load_embedder(model_name="sentence-transformers/all-MiniLM-L6-v2"):
     """
     Load a sentence-transformers embedding model.
