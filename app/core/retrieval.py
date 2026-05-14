@@ -13,7 +13,7 @@ class Retriever:
         self.embeddings = embeddings
         self.chunks = chunks
 
-    def retrieve(self, question: str, k: int = 3) -> list[str]:
+    def retrieve(self, question: str, k: int = 2) -> list[str]:
         """
         Retrieve top-k most similar chunks for a question
         """

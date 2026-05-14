@@ -32,10 +32,10 @@ class UniversalQASystem:
             print("-" * 60)
 
         # Prompt
-        prompt = f"""Based on the following context, answer this question.
+        prompt = f"""Answer the question briefly (2 to 3 sentences max) using only the context.
 
 CONTEXT:
-{clean_context[:1500]}
+{clean_context[:500]}
 
 QUESTION: {clean_question}
 
@@ -55,9 +55,9 @@ ANSWER:"""
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
-                    max_new_tokens=200,
+                    max_new_tokens=80,
                     num_beams=4,
-                    temperature=0.5,
+                    temperature=0.3,
                     do_sample=False,
                     repetition_penalty=1.5,
                     length_penalty=0.8,
